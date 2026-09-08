@@ -3,12 +3,16 @@ export type QuestionType = 'multipla' | 'vf' | 'discursiva';
 
 /* Identificador de assunto. O banco legado (História da Igreja + Apologética)
  * continua acessível pela tela de filtros e não precisa carregar "subject". */
-export type SubjectId = 'historia-apologetica' | 'evangelismo';
+export type SubjectId = 'historia-apologetica' | 'evangelismo' | 'hermeneutica';
+
+/** Conjuntos a que uma questão pertence dentro de um assunto modular. */
+export type QuestionSet = 'fixacao' | 'simulado';
 
 export interface BaseQuestion {
   id: string;
   area?: Area; // presente apenas no banco legado
   subject?: SubjectId; // presente nos assuntos novos (ex.: "evangelismo")
+  sets?: QuestionSet[]; // em quais conjuntos a questão entra (assuntos modulares)
   type: QuestionType;
   topic: string; // ex.: "Concílios e heresias"
   prompt: string;

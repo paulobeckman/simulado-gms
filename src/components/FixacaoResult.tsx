@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ArrowLeft, BookOpenText, FileText, RotateCcw } from 'lucide-react';
+import { ArrowLeft, BookOpenText, Download, RotateCcw } from 'lucide-react';
 import type { QuizResultItem } from '../hooks/useQuiz';
 import type { FixacaoPart } from '../data/subjects';
 import { selfAssessmentLabel } from '../lib/format';
@@ -139,15 +139,14 @@ export function FixacaoResult({ part, results, unlockKey, onRedo, onBack }: Prop
           <h3 className="font-semibold">Material da aula</h3>
           <a
             href={part.material.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            download
             className="flex items-start gap-3 rounded-lg border border-neutral-200 p-4 transition-colors hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-900"
           >
-            <FileText size={20} className="mt-0.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+            <Download size={20} className="mt-0.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
             <span>
               <span className="block text-sm font-medium">{part.material.title}</span>
               <span className="block text-xs text-neutral-500 dark:text-neutral-400">
-                Abrir em uma nova aba
+                Baixar o PDF
               </span>
             </span>
           </a>

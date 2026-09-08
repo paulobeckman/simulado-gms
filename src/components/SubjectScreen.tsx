@@ -3,7 +3,7 @@ import {
   ArrowLeft,
   BookOpen,
   ChevronRight,
-  FileText,
+  Download,
   GraduationCap,
   RotateCcw,
 } from 'lucide-react';
@@ -186,12 +186,11 @@ function PartRow({
       {unlocked && part.material && (
         <a
           href={part.material.url}
-          target="_blank"
-          rel="noopener noreferrer"
+          download
           className="mt-3 inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-900"
         >
-          <FileText size={16} />
-          Material da aula
+          <Download size={16} />
+          Baixar material da aula (PDF)
         </a>
       )}
 

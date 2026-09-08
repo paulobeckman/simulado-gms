@@ -22,27 +22,39 @@ Há dois formatos de assunto:
 ### Nota mínima e material da aula
 
 Cada parte de fixação tem um `passRatio` (padrão `0.6`, ou seja 60%) e um `material`
-(o conteúdo da aula, hoje uma página em `public/conteudo/`).
+(o PDF da aula, servido da raiz do site).
 
-- Ao **atingir 60% ou mais**, a tela de resultado libera o link do material e lista, para
-  cada assunto errado, onde revisar (mapa em `part.studyMap`). Um marcador fica salvo em
-  `gms:unlocked:{subjectId}:fixacao:{partId}`, e o link do material passa a aparecer também
+- Ao **atingir 60% ou mais**, a tela de resultado libera o botão de download do PDF e lista,
+  para cada assunto errado, onde revisar (mapa em `part.studyMap`). Um marcador fica salvo em
+  `gms:unlocked:{subjectId}:fixacao:{partId}`, e o botão de download passa a aparecer também
   na lista de partes.
 - **Abaixo de 60%**, a tela apenas mostra a pontuação, os assuntos a focar e um botão para
   responder de novo. O material não é liberado.
 
-O material de Evangelismo, Aula 01, Parte 01 está em
-`public/conteudo/evangelismo-aula-01-parte-01.html` (reprodução da revisão em anexo, com as
-seções 01 a 09). Para servir o PDF original no lugar, coloque o arquivo em `public/conteudo/`
-e aponte `material.url` para ele em `src/data/subjects.ts`.
+Os PDFs ficam em `public/` (copiados para a raiz de `dist/` no build) e o link usa `download`:
+
+- `public/evangelismo-aula-01-parte-01.pdf` -> `material.url: '/evangelismo-aula-01-parte-01.pdf'`
+- `public/hermeneutica-aula-02.pdf` -> `material.url: '/hermeneutica-aula-02.pdf'`
+
+Para trocar um material, substitua o arquivo em `public/` mantendo o nome, ou aponte
+`material.url` para o novo arquivo em `src/data/subjects.ts`. O `studyMap` de cada parte
+aponta o tópico de cada questão para a seção correspondente do PDF.
+
+O assunto `evangelismo` reúne as duas aulas ("Evangelismo e Hermenêutica") como duas
+`fixacaoParts` do mesmo card. A prova simulada segue "Em breve"; as questões marcadas apenas
+com `sets: ['simulado']` já estão no banco (`src/data/questions-hermeneutica.ts`), aguardando
+esse modo.
 
 ### Como adicionar um novo assunto
 
 1. Crie o banco em `src/data/questions-<assunto>.ts`, exportando um `Question[]`.
-   Cada questão leva `subject: '<assunto>'` (sem o campo `area`, que é só do banco legado).
+   Cada questão leva `subject: '<assunto>'` (sem o campo `area`, que é só do banco legado) e,
+   se o assunto tiver prova, `sets: ('fixacao' | 'simulado')[]`.
 2. Adicione o id em `SubjectId` (`src/types.ts`).
 3. Registre o assunto em `src/data/subjects.ts`, com `kind: 'modular'` e uma ou mais
-   `fixacaoParts` (cada parte com `id`, `lesson`, `title` e as `questions` daquela aula).
+   `fixacaoParts` (cada parte com `id`, `lesson`, `title`, `questions`, e opcionalmente
+   `passRatio`, `material` e `studyMap`). Para adicionar outra aula a um assunto existente,
+   basta acrescentar uma `FixacaoPart` ao array.
 4. Ligue o novo id no `onSelectMode` do `HomeScreen` em `src/App.tsx`
    (hoje só `evangelismo` + `fixacao` está ligado).
 
@@ -106,9 +118,8 @@ src/
   data/
     subjects.ts                registro dos assuntos, partes de fixação, nota mínima e material
     questions.ts               banco legado (História da Igreja + Apologética)
-    questions-evangelismo.ts   banco do assunto Evangelismo
-public/
-  conteudo/                    material das aulas liberado ao atingir a nota mínima
+    questions-evangelismo.ts   banco da Aula 01 (Evangelismo)
+    questions-hermeneutica.ts  banco da Aula 02 (Hermenêutica), com o campo sets
   types.ts                     modelo de dados
   lib/format.ts                rótulos e formatação
   hooks/
@@ -129,4 +140,5 @@ public/
     ResultScreen.tsx           resultado completo do assunto legado
     ThemeToggle.tsx
   App.tsx
+public/*.pdf                   PDFs das aulas, liberados ao atingir a nota mínima
 ```
