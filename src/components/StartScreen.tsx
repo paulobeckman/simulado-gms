@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Play, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Play, RotateCcw } from 'lucide-react';
 import { questions } from '../data/questions';
 import type {
   AreaFilter,
@@ -14,6 +14,7 @@ interface Props {
   savedProgress: { index: number; total: number } | null;
   onStart: (config: QuizConfig) => void;
   onResume: () => void;
+  onBack: () => void;
 }
 
 const areaOptions: { value: AreaFilter; label: string }[] = [
@@ -77,7 +78,7 @@ function Segmented<T extends string | number>({
   );
 }
 
-export function StartScreen({ hasSavedSession, savedProgress, onStart, onResume }: Props) {
+export function StartScreen({ hasSavedSession, savedProgress, onStart, onResume, onBack }: Props) {
   const [area, setArea] = useState<AreaFilter>('todas');
   const [type, setType] = useState<TypeFilter>('todos');
   const [quantity, setQuantity] = useState<QuantityFilter>(20);
@@ -103,8 +104,17 @@ export function StartScreen({ hasSavedSession, savedProgress, onStart, onResume 
 
   return (
     <div className="space-y-8">
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100"
+      >
+        <ArrowLeft size={16} />
+        Todos os assuntos
+      </button>
+
       <div>
-        <h2 className="text-xl font-semibold sm:text-2xl">Simulado de estudos</h2>
+        <h2 className="text-xl font-semibold sm:text-2xl">História da Igreja e Apologética</h2>
         <p className="mt-2 leading-relaxed text-neutral-600 dark:text-neutral-400">
           {totals.total} questões no banco, sendo {totals.historia} de História da Igreja e{' '}
           {totals.apologetica} de Apologética. Ajuste os filtros e comece quando quiser.

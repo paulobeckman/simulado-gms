@@ -1,4 +1,7 @@
 import { useQuiz } from './hooks/useQuiz';
+import { getSubject } from './data/subjects';
+import { HomeScreen } from './components/HomeScreen';
+import { SubjectScreen } from './components/SubjectScreen';
 import { StartScreen } from './components/StartScreen';
 import { QuestionCard } from './components/QuestionCard';
 import { ProgressBar } from './components/ProgressBar';
@@ -12,23 +15,40 @@ export default function App() {
     <div className="min-h-screen">
       <header className="border-b border-neutral-200 dark:border-neutral-800">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4">
-          <div>
-            <h1 className="text-base font-semibold sm:text-lg">Simulado GMS</h1>
+          <button type="button" onClick={quiz.goHome} className="text-left">
+            <h1 className="text-base font-semibold sm:text-lg">Plataforma de Estudos</h1>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              História da Igreja e Apologética
+              Plataforma de estudo para fixação
             </p>
-          </div>
+          </button>
           <ThemeToggle />
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
+        {quiz.view === 'home' && (
+          <HomeScreen
+            hasSavedSession={quiz.hasSavedSession}
+            savedProgress={quiz.savedProgress}
+            onOpenLegado={quiz.openLegado}
+            onResume={quiz.resume}
+            onSelectMode={(subjectId, mode) => {
+              if (subjectId === 'evangelismo' && mode === 'fixacao') quiz.openEvangelismo();
+            }}
+          />
+        )}
+
+        {quiz.view === 'evangelismo' && getSubject('evangelismo') && (
+          <SubjectScreen subject={getSubject('evangelismo')!} onBack={quiz.goHome} />
+        )}
+
         {quiz.view === 'start' && (
           <StartScreen
             hasSavedSession={quiz.hasSavedSession}
             savedProgress={quiz.savedProgress}
             onStart={quiz.start}
             onResume={quiz.resume}
+            onBack={quiz.goHome}
           />
         )}
 
@@ -57,7 +77,7 @@ export default function App() {
             wrongCount={quiz.wrongCount}
             onRedoAll={quiz.restartAll}
             onRedoWrong={quiz.restartWrongOnly}
-            onBackToStart={quiz.backToStart}
+            onBackToStart={quiz.goHome}
           />
         )}
       </main>

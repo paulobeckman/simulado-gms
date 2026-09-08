@@ -79,9 +79,11 @@ export function QuestionCard({
   return (
     <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
       <div className="flex flex-wrap gap-2">
-        <span className="rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
-          {areaLabel(question.area)}
-        </span>
+        {question.area && (
+          <span className="rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+            {areaLabel(question.area)}
+          </span>
+        )}
         <span className="rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
           {question.topic}
         </span>

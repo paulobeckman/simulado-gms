@@ -57,7 +57,7 @@ export interface QuizResultItem {
 
 export function useQuiz() {
   const [session, setSession, clearSession] = useLocalStorage<QuizSession | null>(SESSION_KEY, null);
-  const [view, setView] = useState<'start' | 'quiz' | 'result'>('start');
+  const [view, setView] = useState<'home' | 'start' | 'quiz' | 'result' | 'evangelismo'>('home');
 
   const questionMap = useMemo(() => {
     const m = new Map<string, Question>();
@@ -109,6 +109,9 @@ export function useQuiz() {
   }, [session]);
 
   const backToStart = useCallback(() => setView('start'), []);
+  const goHome = useCallback(() => setView('home'), []);
+  const openLegado = useCallback(() => setView('start'), []);
+  const openEvangelismo = useCallback(() => setView('evangelismo'), []);
 
   const revealHint = useCallback(() => {
     if (currentId) patchAnswer(currentId, { hintUsed: true });
@@ -230,6 +233,9 @@ export function useQuiz() {
     start,
     resume,
     backToStart,
+    goHome,
+    openLegado,
+    openEvangelismo,
     revealHint,
     submitMultipla,
     submitVf,
