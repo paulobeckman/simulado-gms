@@ -11,7 +11,7 @@ import { useLocalStorage } from './useLocalStorage';
 
 const SESSION_KEY = 'simulado-gms:session';
 
-function shuffle<T>(arr: T[]): T[] {
+export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));

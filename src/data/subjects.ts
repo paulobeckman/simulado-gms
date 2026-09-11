@@ -3,6 +3,7 @@ import { evangelismoQuestions } from './questions-evangelismo';
 import { hermeneuticaFixacao } from './questions-hermeneutica';
 import { hermeneuticaObservacaoQuestions } from './questions-hermeneutica-observacao';
 import { hermeneuticaEstudoBiblicoQuestions } from './questions-hermeneutica-estudo-biblico';
+import { evangelismoHermeneuticaSimulado } from './questions-evangelismo-hermeneutica-simulado';
 
 export type SubjectStatus = 'disponivel' | 'em-breve';
 
@@ -45,6 +46,11 @@ export interface Subject {
   simulado?: {
     status: SubjectStatus;
     size: number; // quantas questões a prova sorteia quando estiver disponível
+    questions?: Question[]; // banco de questões da prova, quando status é 'disponivel'
+    /** Fração mínima de acerto para liberar o material da prova. Padrão: 0.6 */
+    passRatio?: number;
+    /** Material de revisão liberado ao atingir o passRatio. */
+    material?: { title: string; url: string };
   };
 }
 
@@ -169,8 +175,16 @@ export const subjects: Subject[] = [
         },
       },
     ],
-    // Ainda não há banco dedicado de prova; a prova simulada fica "Em breve".
-    simulado: { status: 'em-breve', size: 25 },
+    simulado: {
+      status: 'disponivel',
+      size: evangelismoHermeneuticaSimulado.length,
+      questions: evangelismoHermeneuticaSimulado,
+      passRatio: 0.6,
+      material: {
+        title: 'Revisão — Evangelismo e Hermenêutica',
+        url: '/revisao-evangelismo-e-hermeneutica.pdf',
+      },
+    },
   },
 ];
 

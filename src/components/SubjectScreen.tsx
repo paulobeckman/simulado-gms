@@ -3,9 +3,12 @@ import { ArrowLeft, BookOpen, ChevronRight, Download, GraduationCap, RotateCcw }
 import type { FixacaoPart, Subject } from '../data/subjects';
 import { modeInfo } from '../data/subjects';
 import { useFixacao } from '../hooks/useFixacao';
+import { useSimulado } from '../hooks/useSimulado';
 import { QuestionCard } from './QuestionCard';
+import { SimuladoQuestionCard } from './SimuladoQuestionCard';
 import { ProgressBar } from './ProgressBar';
 import { FixacaoResult } from './FixacaoResult';
+import { SimuladoResult } from './SimuladoResult';
 
 interface Props {
   subject: Subject;
@@ -26,6 +29,10 @@ function isUnlocked(key: string): boolean {
   } catch {
     return false;
   }
+}
+
+function simuladoStorageKey(subjectId: string) {
+  return `gms:progress:${subjectId}:simulado`;
 }
 
 function hasSavedPart(key: string): { index: number; total: number } | null {
@@ -135,6 +142,90 @@ function FixacaoRunner({
   );
 }
 
+function SimuladoRunner({
+  subject,
+  onExit,
+}: {
+  subject: Subject;
+  onExit: () => void;
+}) {
+  const questions = subject.simulado?.questions ?? [];
+  const sim = useSimulado(questions, simuladoStorageKey(subject.id));
+  const [phase, setPhase] = useState<'quiz' | 'result'>(sim.finished ? 'result' : 'quiz');
+
+  if (phase === 'result' || sim.finished) {
+    return (
+      <SimuladoResult
+        results={sim.results}
+        passRatio={subject.simulado?.passRatio}
+        material={subject.simulado?.material}
+        onSetSelfAssessment={sim.setSelfAssessmentFor}
+        onToggleKeyPoint={sim.toggleKeyPointFor}
+        onRedo={() => {
+          sim.restart();
+          setPhase('quiz');
+        }}
+        onBack={() => {
+          sim.clearStored();
+          onExit();
+        }}
+      />
+    );
+  }
+
+  if (!sim.currentQuestion) {
+    return (
+      <div className="space-y-4">
+        <p className="text-neutral-600 dark:text-neutral-400">Nenhuma questão na prova simulada.</p>
+        <button
+          type="button"
+          onClick={onExit}
+          className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100"
+        >
+          <ArrowLeft size={16} />
+          Voltar ao assunto
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          onClick={onExit}
+          className="inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100"
+        >
+          <ArrowLeft size={16} />
+          {subject.title}
+        </button>
+        <span className="text-xs text-neutral-400">Prova simulada</span>
+      </div>
+
+      <ProgressBar current={sim.currentNumber} total={sim.total} />
+
+      <SimuladoQuestionCard
+        key={sim.currentQuestion.id}
+        question={sim.currentQuestion}
+        answer={sim.currentAnswer}
+        isLast={sim.isLast}
+        onSubmitMultipla={sim.submitMultipla}
+        onSubmitVf={sim.submitVf}
+        onSubmitDiscursiva={sim.submitDiscursiva}
+        onNext={() => {
+          if (sim.isLast) {
+            sim.goNext();
+            setPhase('result');
+          } else {
+            sim.goNext();
+          }
+        }}
+      />
+    </div>
+  );
+}
+
 function PartRow({
   subjectId,
   part,
@@ -223,8 +314,13 @@ function PartRow({
 
 export function SubjectScreen({ subject, onBack }: Props) {
   const [activePart, setActivePart] = useState<FixacaoPart | null>(null);
+  const [simuladoActive, setSimuladoActive] = useState(false);
   const parts = subject.fixacaoParts ?? [];
-  const simuladoEmBreve = subject.simulado?.status !== 'disponivel';
+  const simuladoDisponivel =
+    subject.simulado?.status === 'disponivel' && (subject.simulado.questions?.length ?? 0) > 0;
+  const simuladoEmBreve = !simuladoDisponivel;
+  const simuladoKey = simuladoStorageKey(subject.id);
+  const savedSimulado = simuladoDisponivel ? hasSavedPart(simuladoKey) : null;
 
   if (activePart) {
     return (
@@ -235,6 +331,10 @@ export function SubjectScreen({ subject, onBack }: Props) {
         onExit={() => setActivePart(null)}
       />
     );
+  }
+
+  if (simuladoActive) {
+    return <SimuladoRunner subject={subject} onExit={() => setSimuladoActive(false)} />;
   }
 
   return (
@@ -292,19 +392,45 @@ export function SubjectScreen({ subject, onBack }: Props) {
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
           {modeInfo.simulado.description}
         </p>
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
           <span className="text-sm text-neutral-600 dark:text-neutral-300">
             {simuladoEmBreve
               ? 'A prova simulada deste assunto ainda está sendo montada.'
-              : `Prova com ${subject.simulado?.size ?? 0} questões sorteadas.`}
+              : `Prova com ${subject.simulado?.size ?? 0} questões.`}
           </span>
           {simuladoEmBreve ? (
             <span className="shrink-0 rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
               Em breve
             </span>
+          ) : savedSimulado ? (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setSimuladoActive(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+              >
+                <RotateCcw size={16} />
+                Continuar (questão {savedSimulado.index} de {savedSimulado.total})
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    window.localStorage.removeItem(simuladoKey);
+                  } catch {
+                    /* ignora */
+                  }
+                  setSimuladoActive(true);
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900"
+              >
+                Recomeçar
+              </button>
+            </div>
           ) : (
             <button
               type="button"
+              onClick={() => setSimuladoActive(true)}
               className="shrink-0 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
             >
               Começar prova
