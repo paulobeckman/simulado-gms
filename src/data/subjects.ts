@@ -1,6 +1,8 @@
 import type { Question, SubjectId } from '../types';
 import { evangelismoQuestions } from './questions-evangelismo';
 import { hermeneuticaFixacao } from './questions-hermeneutica';
+import { hermeneuticaObservacaoQuestions } from './questions-hermeneutica-observacao';
+import { hermeneuticaEstudoBiblicoQuestions } from './questions-hermeneutica-estudo-biblico';
 
 export type SubjectStatus = 'disponivel' | 'em-breve';
 
@@ -30,6 +32,8 @@ export interface Subject {
   lesson?: string; // linha da aula, quando fizer sentido
   subtitle: string;
   status: SubjectStatus;
+  /** Aparece no grupo "Assunto da semana" na tela inicial. Os demais vão para "Aulas passadas". */
+  featured?: boolean;
   /**
    * 'legado'  -> banco atual (História da Igreja + Apologética): abre a tela de filtros já existente.
    * 'modular' -> assuntos novos: card com dois modos, "Questões de fixação" e "Prova simulada".
@@ -67,8 +71,9 @@ export const subjects: Subject[] = [
   {
     id: 'evangelismo',
     title: 'Evangelismo e Hermenêutica',
+    featured: true,
     subtitle:
-      'Aula 01: o encontro em Samaria e o chamado a transbordar. Aula 02: método de estudo bíblico, observação, interpretação e aplicação.',
+      'Aula 01: o encontro em Samaria e o chamado a transbordar. Aula 02: método de estudo bíblico, observação, interpretação e aplicação. Aula 3: observação do texto, bombardeio de perguntas, estrutura e cânon. Aula 4: fases do estudo bíblico, princípios de interpretação, linguagem figurada e profecia.',
     status: 'disponivel',
     kind: 'modular',
     fixacaoParts: [
@@ -138,6 +143,29 @@ export const subjects: Subject[] = [
             'Parte 1B (Mateus 6:33; a advertência de Apocalipse 22 sobre acrescentar ou tirar)',
           'Uso das Escrituras':
             'Parte 2B ("A Bíblia não é o livro dos grandes homens de Deus")',
+        },
+      },
+      {
+        id: 'hermeneutica-observacao-do-texto',
+        lesson: 'Aula 3',
+        title: 'Processo de observação, bombardeio de perguntas, estrutura do texto e cânon',
+        questions: hermeneuticaObservacaoQuestions,
+        passRatio: 0.6,
+        material: {
+          title: 'Revisão — Método de Estudo Bíblico',
+          url: '/revisao-metodo-estudo-biblico2.pdf',
+        },
+      },
+      {
+        id: 'hermeneutica-estudo-biblico',
+        lesson: 'Aula 4',
+        title:
+          'Fases do estudo bíblico, princípios de interpretação, linguagem figurada e profecia',
+        questions: hermeneuticaEstudoBiblicoQuestions,
+        passRatio: 0.6,
+        material: {
+          title: 'Revisão — Método de Estudo Bíblico',
+          url: '/revisao-metodo-estudo-biblico3.pdf',
         },
       },
     ],

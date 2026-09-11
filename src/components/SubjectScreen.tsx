@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  ArrowLeft,
-  BookOpen,
-  ChevronRight,
-  Download,
-  GraduationCap,
-  RotateCcw,
-} from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronRight, Download, GraduationCap, RotateCcw } from 'lucide-react';
 import type { FixacaoPart, Subject } from '../data/subjects';
 import { modeInfo } from '../data/subjects';
 import { useFixacao } from '../hooks/useFixacao';

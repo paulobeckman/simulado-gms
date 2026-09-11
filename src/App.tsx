@@ -32,8 +32,8 @@ export default function App() {
             savedProgress={quiz.savedProgress}
             onOpenLegado={quiz.openLegado}
             onResume={quiz.resume}
-            onSelectMode={(subjectId, mode) => {
-              if (subjectId === 'evangelismo' && mode === 'fixacao') quiz.openEvangelismo();
+            onSelectMode={(subjectId) => {
+              if (subjectId === 'evangelismo') quiz.openEvangelismo();
             }}
           />
         )}

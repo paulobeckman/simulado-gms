@@ -154,8 +154,25 @@ export function HomeScreen({
   onResume,
   onSelectMode,
 }: Props) {
+  const featured = subjects.filter((s) => s.featured);
+  const past = subjects.filter((s) => !s.featured);
+
+  const renderCard = (subject: Subject) =>
+    subject.kind === 'legado' ? (
+      <LegadoCard
+        key={subject.id}
+        subject={subject}
+        hasSavedSession={hasSavedSession}
+        savedProgress={savedProgress}
+        onOpen={onOpenLegado}
+        onResume={onResume}
+      />
+    ) : (
+      <ModularCard key={subject.id} subject={subject} onSelectMode={onSelectMode} />
+    );
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h2 className="text-xl font-semibold sm:text-2xl">Escolha um assunto</h2>
         <p className="mt-2 leading-relaxed text-neutral-600 dark:text-neutral-400">
@@ -164,22 +181,23 @@ export function HomeScreen({
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {subjects.map((subject) =>
-          subject.kind === 'legado' ? (
-            <LegadoCard
-              key={subject.id}
-              subject={subject}
-              hasSavedSession={hasSavedSession}
-              savedProgress={savedProgress}
-              onOpen={onOpenLegado}
-              onResume={onResume}
-            />
-          ) : (
-            <ModularCard key={subject.id} subject={subject} onSelectMode={onSelectMode} />
-          ),
-        )}
-      </div>
+      {featured.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+            Assunto da semana
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2">{featured.map(renderCard)}</div>
+        </section>
+      )}
+
+      {past.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+            Aulas passadas
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2">{past.map(renderCard)}</div>
+        </section>
+      )}
     </div>
   );
 }
