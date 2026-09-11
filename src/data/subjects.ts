@@ -61,7 +61,7 @@ export const modeInfo: Record<QuizMode, { label: string; description: string }> 
   },
   simulado: {
     label: 'Prova simulada',
-    description: 'Simulado de avaliação, sem dicas, com resultado só no final.',
+    description: 'Todas as questões da aula, com dica disponível e correção logo após responder.',
   },
 };
 
